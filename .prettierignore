@@ -1,3 +1,6 @@
 # Ignore artifacts:
 build
 coverage
+
+# Ignore the generated route tree file
+**/routeTree.gen.ts
