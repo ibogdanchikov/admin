@@ -9,50 +9,116 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as FeaturesRouteRouteImport } from './routes/_features/route'
+import { Route as FeaturesIndexRouteImport } from './routes/_features/index'
+import { Route as FeaturesMyFeatureRouteImport } from './routes/_features/my-feature'
 
-const IndexRoute = IndexRouteImport.update({
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRouteRoute = FeaturesRouteRouteImport.update({
+  id: '/_features',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesIndexRoute = FeaturesIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => FeaturesRouteRoute,
+} as any)
+const FeaturesMyFeatureRoute = FeaturesMyFeatureRouteImport.update({
+  id: '/my-feature',
+  path: '/my-feature',
+  getParentRoute: () => FeaturesRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/my-feature': typeof FeaturesMyFeatureRoute
+  '/': typeof FeaturesIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/my-feature': typeof FeaturesMyFeatureRoute
+  '/': typeof FeaturesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_features': typeof FeaturesRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_features/my-feature': typeof FeaturesMyFeatureRoute
+  '/_features/': typeof FeaturesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/login' | '/my-feature' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/login' | '/my-feature' | '/'
+  id:
+    | '__root__'
+    | '/_features'
+    | '/login'
+    | '/_features/my-feature'
+    | '/_features/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  FeaturesRouteRoute: typeof FeaturesRouteRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_features': {
+      id: '/_features'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof FeaturesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_features/': {
+      id: '/_features/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof FeaturesIndexRouteImport
+      parentRoute: typeof FeaturesRouteRoute
+    }
+    '/_features/my-feature': {
+      id: '/_features/my-feature'
+      path: '/my-feature'
+      fullPath: '/my-feature'
+      preLoaderRoute: typeof FeaturesMyFeatureRouteImport
+      parentRoute: typeof FeaturesRouteRoute
     }
   }
 }
 
+interface FeaturesRouteRouteChildren {
+  FeaturesMyFeatureRoute: typeof FeaturesMyFeatureRoute
+  FeaturesIndexRoute: typeof FeaturesIndexRoute
+}
+
+const FeaturesRouteRouteChildren: FeaturesRouteRouteChildren = {
+  FeaturesMyFeatureRoute: FeaturesMyFeatureRoute,
+  FeaturesIndexRoute: FeaturesIndexRoute,
+}
+
+const FeaturesRouteRouteWithChildren = FeaturesRouteRoute._addFileChildren(
+  FeaturesRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  FeaturesRouteRoute: FeaturesRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
