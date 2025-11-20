@@ -16,4 +16,16 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:8081",
+        bypass: (req) => {
+          delete req.headers.origin;
+          return;
+        },
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
 });
